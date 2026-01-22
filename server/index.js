@@ -4,7 +4,10 @@ const cors = require("cors");
 
 const app = express();
 
-app.use(cors());
+const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:5173";
+app.use(cors({
+    origin: CORS_ORIGIN
+}));
 app.use(express.json());
 
 app.get("/api/ping", (req, res) => {
