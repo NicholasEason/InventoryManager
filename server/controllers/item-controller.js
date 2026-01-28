@@ -1,28 +1,53 @@
 const express = require("express");
 const router = express.Router();
+const itemRepo = require("../repositories/item-repo");
+const Item = require("../models/item");
 
 router.route("/")
-.get((req, res) => {
-    //TODO: Connect to database and return all items
-    res.status(200).send("GET to Items successful!");
+.get(async (req, res) => {
+    let {response, error} = await itemRepo.getAllItems();
+    if(error){
+        res.status(404).send("No items found.");
+    } else {
+        res.status(200).send(response);
+    }
 })
-.post((req, res) => {
-    //TODO: Connect to database and submit new item to the database
-    res.status(201).send("POST to Items successful!");
+.post(async (req, res) => {
+    let item = new Item(req.body.id);
+    let {response, error} = await itemRepo.createItem(item);
+    if(error){
+        res.status(500).send("Something went wrong.");
+    } else {
+        res.status(201).send(response);
+    }
 });
 
 router.route("/:id")
-.get((req, res) => {
-    //TODO: Connect to database and return item from database
-    res.status(200).send(`GET to Item ID ${req.params.id} successful!`);
+.get(async (req, res) => {
+    let {response, error} = await itemRepo.getItemById(req.params.id);
+    if(error){
+        res.status(404).send(`No item found at ID ${req.params.id}.`);
+    } else {
+        res.status(200).send(response);
+    }
 })
-.put((req, res) => {
-    //TODO: Connect to database and update item in the database
-    res.status(200).send(`PUT to Item ID ${req.params.id} successful!`);
+.put(async (req, res) => {
+    //req.body should contain all of the necessary information to fulfill a PUT
+    let item = new Item(req.params.id);
+    let {response, error} = await itemRepo.updateItem(item);
+    if(error){
+        res.status(500).send("Something went wrong.");
+    } else {
+        res.status(200).send(response);
+    }
 })
-.delete((req, res) => {
-    //TODO: Connect to database and delete item in the database
-    res.status(204);
+.delete(async (req, res) => {
+    let {response, error} = await itemRepo.deleteItem(req.params.id);
+    if(error){
+        res.status(404).send(`No item found at ID ${req.params.id}.`);
+    } else {
+        res.status(200).send(response);
+    }
 });
 
 module.exports = router;
