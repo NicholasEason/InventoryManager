@@ -3,11 +3,11 @@ const warehouseRepo = require("../repositories/warehouse-repo");
 const getAllWarehouses = async () => {
     const {response, error} = await warehouseRepo.getAllWarehouses();
     if(error){
-        //TODO: do something with the error
-        console.log(error);
-    } else {
+        //TODO: Logging later?
+        console.error(error);
         return {response, error};
     }
+    return {response, error};
 }
 
 const getWarehouseById = async (id) => {
