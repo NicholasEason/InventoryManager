@@ -12,16 +12,16 @@ const getWarehouseById = async (id) => {
     return {response: response, error: error};
 }
 
-const createWarehouse = async (warehouse) => {
+const createWarehouse = async (warehouseJSON) => {
     //TODO: Connect to database and return warehouse from database
-    let response = `POST to create ${warehouse.id} successful!`;
+    let response = `POST to create ${warehouseJSON.id} successful!`;
     let error = null;
     return {response: response, error: error};
 }
 
-const updateWarehouse = async (warehouse) => {
+const updateWarehouse = async (warehouseJSON) => {
     //TODO: Connect to database and update warehouse in the database
-    let response = `PUT to update ${warehouse} successful!`;
+    let response = `PUT to update ${warehouseJSON.id} successful!`;
     let error = null;
     return {response: response, error: error};
 }

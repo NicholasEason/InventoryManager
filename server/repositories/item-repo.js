@@ -12,16 +12,16 @@ const getItemById = async (id) => {
     return {response: response, error: error};
 }
 
-const createItem = async (item) => {
+const createItem = async (itemJSON) => {
     //TODO: Connect to database and return item from database
-    let response = `POST to create ${item} successful!`;
+    let response = `POST to create ${itemJSON.id} successful!`;
     let error = null;
     return {response: response, error: error};
 }
 
-const updateItem = async (item) => {
+const updateItem = async (itemJSON) => {
     //TODO: Connect to database and update item in the database
-    let response = `PUT to update ${item} successful!`;
+    let response = `PUT to update ${itemJSON.id} successful!`;
     let error = null;
     return {response: response, error: error};
 }
