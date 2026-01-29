@@ -11,11 +11,11 @@ app.use(cors({
 }));
 app.use(express.json());
 
-const warehouse_controller = require("./controllers/warehouse-controller");
-app.use("/warehouses", warehouse_controller);
+const warehouse_router = require("./routes/warehouse-routes");
+app.use("/warehouses", warehouse_router);
 
-const item_controller = require("./controllers/item-controller");
-app.use("/items", item_controller);
+const item_router = require("./routes/item-routes");
+app.use("/items", item_router);
 
 const PORT = process.env.API_PORT || 5000;
 app.listen(PORT, () => {
