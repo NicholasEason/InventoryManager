@@ -8,6 +8,10 @@ const getAllWarehouses = async () => {
     await Warehouse.find().populate("inventory.item").then((res) => {
         response = res;
     }).catch((err) => {
+        /*
+        TODO: Timeouts should return a 504, everything else here a 500
+            MongooseError: Operation `warehouses.find()` buffering timed out after 10000ms at Timeout._onTimeout
+        */
         console.log(err);
         error = {};
         error.status = 500;
@@ -26,8 +30,19 @@ const getWarehouseById = async (id) => {
 
 const createWarehouse = async (warehouseJSON) => {
     //TODO: Connect to database and return warehouse from database
-    let response = `POST to create ${warehouseJSON.id} successful!`;
+    let response = {};
     let error = null;
+    await Warehouse.create(warehouseJSON).then(async (res) => {
+        ({response, error} = await getWarehouseById(warehouseJSON['_id']));
+    }).catch((err) => {
+        console.log(err);
+        if(!error){
+            error = {};
+            error.status = 500;
+            error.message = `Failed to create Warehouse with ID ${warehouseJSON['_id']}`;
+        }
+    });
+
     return {response: response, error: error};
 }
 

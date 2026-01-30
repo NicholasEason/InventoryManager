@@ -19,7 +19,16 @@ const getWarehouseById = async (req, res, id) => {
 }
 
 const createWarehouse = async (req, res) => {
-    let {response, error} = await warehouseService.createWarehouse(req.body);
+    let response = "";
+    let error = null;
+
+    try{
+        ({response, error} = await warehouseService.createWarehouse(req.body));
+    } catch (error){
+        res.status(400).send("Bad Request");
+        return;
+    }
+
     if(error){
         res.status(500).send("Something went wrong.");
     } else {
