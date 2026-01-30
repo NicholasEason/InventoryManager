@@ -1,12 +1,14 @@
 const Warehouse = require("../models/warehouse");
+const Item = require("../models/item");
 
 const getAllWarehouses = async () => {
     let response = {};
     let error = null;
 
-    await Warehouse.find().then((res) => {
+    await Warehouse.find().populate("inventory.item").then((res) => {
         response = res;
     }).catch((err) => {
+        console.log(err);
         error = {};
         error.status = 500;
         error.message = "Internal Server Error"

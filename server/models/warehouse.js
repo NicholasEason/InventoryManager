@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const warehouseInventorySchema = new mongoose.Schema({
-    itemId: {
+    item: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Item',
         required: true
