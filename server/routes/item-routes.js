@@ -7,7 +7,7 @@ router.route("/")
     itemController.getAllItems(req, res);
 })
 .post(async (req, res) => {
-    itemController.updateItem(req, res);
+    itemController.createItem(req, res);
 });
 
 router.route("/:id")
@@ -15,7 +15,7 @@ router.route("/:id")
     itemController.getItemById(req, res, req.params.id);
 })
 .put(async (req, res) => {
-    itemController.updateItem(req, res);
+    itemController.updateItem(req, res, req.params.id);
 })
 .delete(async (req, res) => {
     itemController.deleteItem(req, res, req.params.id);

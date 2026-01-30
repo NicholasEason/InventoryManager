@@ -4,7 +4,7 @@ const getAllItems = async () => {
     const {response, error} = await itemRepo.getAllItems();
     if(error){
         //TODO: do something with the error
-        console.log(error);
+        console.error(error);
     } else {
         return {response, error};
     }
@@ -21,7 +21,7 @@ const getItemById = async (id) => {
 }
 
 const createItem = async (itemJSON) => {
-    const {response, error} = await itemRepo.getItemById(itemJSON);
+    const {response, error} = await itemRepo.createItem(itemJSON);
     if(error){
         //TODO: do something with the error
         console.log(error);
@@ -30,8 +30,11 @@ const createItem = async (itemJSON) => {
     }
 }
 
-const updateItem = async (itemJSON) => {
-    const {response, error} = await itemRepo.updateItem(itemJSON);
+const updateItem = async (itemJSON, id) => {
+    //Remove ID from JSON if it was provided
+    if(itemJSON['_id'])
+        delete itemJSON['_id'];
+    const {response, error} = await itemRepo.updateItem(itemJSON, id);
     if(error){
         //TODO: do something with the error
         console.log(error);
