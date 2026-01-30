@@ -36,13 +36,13 @@ const createWarehouse = async (warehouseJSON) => {
     let response = {};
     let error = null;
     await Warehouse.create(warehouseJSON).then(async (res) => {
-        ({response, error} = await getWarehouseById(warehouseJSON['_id']));
+        ({response, error} = await getWarehouseById(res['_id']));
     }).catch((err) => {
         console.log(err);
         if(!error){
             error = genericHandleErrors(err);
             if(error.status == 500)
-                error.message = `Failed to create Warehouse with ID ${warehouseJSON['_id']}`;
+                error.message = `Failed to create Warehouse as requested.`;
         }
     });
 
