@@ -3,7 +3,7 @@ const warehouseService = require("../services/warehouse-service");
 const getAllWarehouses = async (req, res) => {
     let {response, error} = await warehouseService.getAllWarehouses();
     if(error){
-        res.status(404).send("No warehouses found.");
+        res.status(error.status).send(error.message);
     } else {
         res.status(200).send(response);
     }

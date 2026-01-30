@@ -1,9 +1,30 @@
-class Item{
-    id;
+const mongoose = require("mongoose");
 
-    constructor(id){
-        this.id = id;
-    }
-}
+const itemSchema = new mongoose.Schema({
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    sku: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true
+    },
+    description: {
+      type: String,
+      required: true
+    },
+    category: {
+        type: String,
+        required: false
+    },
+  },
+  {
+    timestamps: true
+  }
+);
 
-module.exports = Item;
+const Item = mongoose.model('Item', itemSchema);
+module.exports = {Item};

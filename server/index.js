@@ -17,6 +17,9 @@ app.use("/warehouses", warehouse_router);
 const item_router = require("./routes/item-routes");
 app.use("/items", item_router);
 
+const dbConnection = require("./config/database");
+dbConnection.connectToDB();
+
 const PORT = process.env.API_PORT || 5000;
 app.listen(PORT, () => {
   console.log(`API server running on http://localhost:${PORT}`);
