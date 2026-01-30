@@ -39,7 +39,6 @@ const getWarehouseById = async (id) => {
 }
 
 const createWarehouse = async (warehouseJSON) => {
-    //TODO: Connect to database and return warehouse from database
     let response = {};
     let error = null;
     await Warehouse.create(warehouseJSON).then(async (res) => {
@@ -56,10 +55,19 @@ const createWarehouse = async (warehouseJSON) => {
     return {response: response, error: error};
 }
 
-const updateWarehouse = async (warehouseJSON) => {
-    //TODO: Connect to database and update warehouse in the database
-    let response = `PUT to update ${warehouseJSON.id} successful!`;
+const updateWarehouse = async (warehouseJSON, id) => {
+    let response = {};
     let error = null;
+    await Warehouse.updateOne({_id: id}, warehouseJSON).then(async (res) => {
+        ({response, error} = await getWarehouseById(id));
+    }).catch((err) => {
+        console.log(err);
+        if(!error){
+            error = {};
+            error.status = 500;
+            error.message = `Failed to update Warehouse with ID ${id}`;
+        }
+    });
     return {response: response, error: error};
 }
 
