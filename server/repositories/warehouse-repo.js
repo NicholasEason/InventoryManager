@@ -8,14 +8,9 @@ const getAllWarehouses = async () => {
     await Warehouse.find().populate("inventory.item").then((res) => {
         response = res;
     }).catch((err) => {
-        /*
-        TODO: Timeouts should return a 504, everything else here a 500
-            MongooseError: Operation `warehouses.find()` buffering timed out after 10000ms at Timeout._onTimeout
-        */
-        console.log(err);
-        error = {};
-        error.status = 500;
-        error.message = "Internal Server Error"
+        error = genericHandleErrors(err);
+        if(error.status == 500)
+            error.message = "Internal Server Error"
     });
 
     return {response: response, error: error};
@@ -29,10 +24,9 @@ const getWarehouseById = async (id) => {
         console.log(res);
         response = res;
     }).catch((err) => {
-        console.log(err);
-        error = {};
-        error.status = 500;
-        error.message = "Internal Server Error";
+        error = genericHandleErrors(err);
+        if(error.status == 500)
+            error.message = "Internal Server Error";
     });
 
     return {response: response, error: error};
@@ -46,9 +40,9 @@ const createWarehouse = async (warehouseJSON) => {
     }).catch((err) => {
         console.log(err);
         if(!error){
-            error = {};
-            error.status = 500;
-            error.message = `Failed to create Warehouse with ID ${warehouseJSON['_id']}`;
+            error = genericHandleErrors(err);
+            if(error.status == 500)
+                error.message = `Failed to create Warehouse with ID ${warehouseJSON['_id']}`;
         }
     });
 
@@ -63,9 +57,9 @@ const updateWarehouse = async (warehouseJSON, id) => {
     }).catch((err) => {
         console.log(err);
         if(!error){
-            error = {};
-            error.status = 500;
-            error.message = `Failed to update Warehouse with ID ${id}`;
+            error = genericHandleErrors(err);
+            if(error.status == 500)
+                error.message = `Failed to update Warehouse with ID ${id}`;
         }
     });
     return {response: response, error: error};
@@ -79,12 +73,30 @@ const deleteWarehouse = async (id) => {
     }).catch((err) => {
         console.log(err);
         if(!error){
-            error = {};
-            error.status = 500;
-            error.message = `Failed to delete Warehouse with ID ${id}`;
+            error = genericHandleErrors(err);
+            if(error.status == 500)
+                error.message = `Failed to delete Warehouse with ID ${id}`;
         }
     });
     return {response: response, error: error};
 }
 
 module.exports = {getAllWarehouses, getWarehouseById, createWarehouse, updateWarehouse, deleteWarehouse};
+
+const genericHandleErrors = (error) => {
+    if(!error) {
+        return;
+    }
+
+    message = {};
+
+    if(error.message.includes("timed out")){
+        message.status = 504;
+        message.message = "Connection to database timed out."
+    } else {
+        //We'll let each endpoint send its own generic message for 500 errors
+        message.status = 500;
+    }
+
+    return message;
+}
