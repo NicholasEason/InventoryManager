@@ -64,7 +64,15 @@ const updateWarehouse = async (req, res, id) => {
 }
 
 const deleteWarehouse = async (req, res, id) => {
-    let {response, error} = await warehouseService.deleteWarehouse(id);
+    let response = "";
+    let error = null;
+
+    try{
+        ({response, error} = await warehouseService.deleteWarehouse(id));
+    } catch (error){
+        res.status(400).send("Bad Request");
+        return;
+    }
     if(error){
         res.status(404).send(`No warehouse found at ID ${req.params.id}.`);
     } else {

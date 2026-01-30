@@ -72,9 +72,18 @@ const updateWarehouse = async (warehouseJSON, id) => {
 }
 
 const deleteWarehouse = async (id) => {
-    //TODO: Connect to database and delete warehouse in the database
-    let response = `DELETE to delete warehouse ID ${id} successful!`;
+    let response = {};
     let error = null;
+    await Warehouse.deleteOne({_id: id}).then(async (res) => {
+        response = `Successfully deleted Warehouse ID ${id}`;
+    }).catch((err) => {
+        console.log(err);
+        if(!error){
+            error = {};
+            error.status = 500;
+            error.message = `Failed to delete Warehouse with ID ${id}`;
+        }
+    });
     return {response: response, error: error};
 }
 
