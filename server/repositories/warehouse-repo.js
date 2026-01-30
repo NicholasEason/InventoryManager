@@ -22,9 +22,19 @@ const getAllWarehouses = async () => {
 }
 
 const getWarehouseById = async (id) => {
-    //TODO: Connect to database and submit new warehouse to the database
-    let response = `GET to Warehouse ${id} successful!`;
+    let response = {};
     let error = null;
+
+    await Warehouse.findById(id).populate("inventory.item").then((res) => {
+        console.log(res);
+        response = res;
+    }).catch((err) => {
+        console.log(err);
+        error = {};
+        error.status = 500;
+        error.message = "Internal Server Error";
+    });
+
     return {response: response, error: error};
 }
 
