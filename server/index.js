@@ -9,7 +9,10 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:5173";
 app.use(cors({
     origin: CORS_ORIGIN
 }));
+
 app.use(express.json());
+
+app.use(require("./middlware/bodyParser-error-handling"));
 
 const warehouse_router = require("./routes/warehouse-routes");
 app.use("/warehouses", warehouse_router);
