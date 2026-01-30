@@ -15,7 +15,7 @@ router.route("/:id")
     warehouseController.getWarehouseById(req, res, req.params.id);
 })
 .put((req, res) => {
-    warehouseController.updateWarehouse(req, res);
+    warehouseController.updateWarehouse(req, res, req.params.id);
 })
 .delete((req, res) => {
     warehouseController.deleteWarehouse(req, res, req.params.id);

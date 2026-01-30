@@ -45,8 +45,17 @@ const createWarehouse = async (req, res) => {
     }
 }
 
-const updateWarehouse = async (req, res) => {
-    let {response, error} = await warehouseService.updateWarehouse(req.body);
+const updateWarehouse = async (req, res, id) => {
+    let response = "";
+    let error = null;
+
+    try{
+        ({response, error} = await warehouseService.updateWarehouse(req.body, id));
+    } catch (error){
+        res.status(400).send("Bad Request");
+        return;
+    }
+
     if(error){
         res.status(500).send("Something went wrong.");
     } else {

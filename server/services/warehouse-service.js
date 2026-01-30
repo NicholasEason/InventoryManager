@@ -35,8 +35,12 @@ const createWarehouse = async (warehouseJSON) => {
     }
 }
 
-const updateWarehouse = async (id, warehouseJSON) => {
-    const {response, error} = await warehouseRepo.updateWarehouse(id, warehouseJSON);
+const updateWarehouse = async (warehouseJSON, id) => {
+    //Remove ID from JSON if it was provided
+    if(warehouseJSON['_id'])
+        delete warehouseJSON['_id'];
+
+    const {response, error} = await warehouseRepo.updateWarehouse(warehouseJSON, id);
     if(error){
         //TODO: do something with the error
         console.log(error);
