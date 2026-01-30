@@ -13,7 +13,7 @@ const getAllWarehouses = async () => {
 const getWarehouseById = async (id) => {
     const {response, error} = await warehouseRepo.getWarehouseById(id);
     if(error){
-        //TODO: do something with the error
+        //Errors from below will bubble up to the controller for the response to be sent.
         console.log(error);
     } else {
         return {response, error};

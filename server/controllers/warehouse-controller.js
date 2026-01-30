@@ -10,9 +10,18 @@ const getAllWarehouses = async (req, res) => {
 }
 
 const getWarehouseById = async (req, res, id) => {
-    let {response, error} = await warehouseService.getWarehouseById(id);
+    let response = "";
+    let error = null;
+
+    try{
+        ({response, error} = await warehouseService.getWarehouseById(id));
+    } catch (error){
+        res.status(404).send(`No warehouse found with ID ${id}.`);
+        return;
+    }
+
     if(error){
-        res.status(404).send("No warehouses found.");
+        res.status(error.status).send(error.message);
     } else {
         res.status(200).send(response);
     }
