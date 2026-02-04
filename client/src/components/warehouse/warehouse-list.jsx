@@ -1,77 +1,147 @@
 import { useState, useEffect } from "react";
+import { Snackbar, Alert } from "@mui/material";
 
 import WarehouseEntry from "./warehouse-entry";
+import NewWarehouseForm from "./new-warehouse-form";
 
-const WarehouseList = ({warehouseEntries}) => {
-
+const WarehouseList = ({ warehouseEntries }) => {
     const [warehouses, setWarehouses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+
+    const [changeSuccess, setChangeSuccess] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
 
     useEffect(() => {
         let cancelled = false;
 
         const loadWarehouses = async () => {
-            try{
+            try {
                 let api_url = import.meta.env.VITE_API_HOST;
-                if(import.meta.env.VITE_API_PORT){
-                    api_url += `:${import.meta.env.VITE_API_PORT}/warehouses`;
+                if (import.meta.env.VITE_API_PORT) {
+                    api_url += `:${import.meta.env.VITE_API_PORT}`;
                 }
+                api_url += `/warehouses`;
 
                 const response = await fetch(api_url);
 
-                if(!response.ok){
-                    throw new Error(`Request Failed: ${response.status}`)
+                if (!response.ok) {
+                    throw new Error(`Request Failed: ${response.status}`);
                 }
 
-                const data = await  response.json();
+                const data = await response.json();
                 console.log(data);
-                if(!cancelled) setWarehouses(data);
-
-            } catch (error){
-                if(!cancelled) setError(error);
-            } finally{
-                if(!cancelled) setLoading(false);
+                if (!cancelled) setWarehouses(data);
+            } catch (error) {
+                if (!cancelled) setError(error);
+            } finally {
+                if (!cancelled) setLoading(false);
             }
-        }
+        };
 
         loadWarehouses();
 
         return () => {
             cancelled = true;
-        }
+        };
     }, []);
 
-    if(loading){
-        return <p>Loading...</p>
+    const onNewWarehouse = (newWarehouse) => {
+        setWarehouses((oldState) => {
+            return [...oldState, newWarehouse];
+        });
+    };
+
+    const onWarehouseDelete = async (id) => {
+        try {
+            let api_url = import.meta.env.VITE_API_HOST;
+            if (import.meta.env.VITE_API_PORT) {
+                api_url += `:${import.meta.env.VITE_API_PORT}`;
+            }
+            api_url += `/warehouses/${id}`;
+
+            const request = {
+                method: "DELETE",
+            };
+
+            const response = await fetch(api_url, request);
+
+            console.log(response);
+
+            if (!response.ok) {
+                throw new Error(`Request Failed: ${response.status}`);
+            }
+
+            setWarehouses((oldState) => {
+                return oldState.filter((warehouse) => warehouse["_id"] != id);
+            });
+            setSuccessMessage(`Successfully deleted warehouse.`);
+            setChangeSuccess(true);
+        } catch (error) {
+            setError(error);
+        }
+    };
+
+    const onWarehouseUpdate = (updatedWarehouse) => {};
+
+    if (loading) {
+        return <p>Loading...</p>;
     }
 
-    if(error){
-        return <>
-            <p>Error: {error.message}</p>
-            <p>Stack Trace:</p>
-            <p>{error.stack}</p>
-        </>
+    if (error) {
+        return (
+            <>
+                <p>Error: {error.message}</p>
+                <p>Stack Trace:</p>
+                <p>{error.stack}</p>
+            </>
+        );
     }
 
     console.log("warehouses in WarehouseList:", warehouses);
     return (
         <>
-            <h2>Warehouse List</h2>
+            <h2>All Warehouses</h2>
             {warehouses.map((warehouse) => (
                 <WarehouseEntry
-                    key = {warehouse['_id']}
-                    id = {warehouse['_id']}
-                    name = {warehouse['name']}
-                    location = {warehouse['location']}
-                    maxCapacity ={warehouse['maxCapacity']} 
-                    inventory = {warehouse['inventory']}
-                    onDelete = {(id) => {}}
-                    onUpdate = {(id) => {}}
+                    key={warehouse["_id"]}
+                    id={warehouse["_id"]}
+                    name={warehouse["name"]}
+                    location={warehouse["location"]}
+                    maxCapacity={warehouse["maxCapacity"]}
+                    inventory={warehouse["inventory"]}
+                    onDelete={onWarehouseDelete}
+                    onUpdate={(id) => {}}
                 />
             ))}
+
+            <Snackbar
+                open={error}
+                autoHideDuration={5000}
+                onClose={() => setError(null)}
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                }}
+            >
+                <Alert severity="error">Error: {error}</Alert>
+            </Snackbar>
+
+            <Snackbar
+                open={changeSuccess}
+                autoHideDuration={5000}
+                onClose={() => setChangeSuccess(false)}
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                }}
+            >
+                <Alert severity="success">{successMessage}</Alert>
+            </Snackbar>
+
+            <NewWarehouseForm onUpdate={onNewWarehouse} />
         </>
     );
-}
+};
 
 export default WarehouseList;
