@@ -1,21 +1,26 @@
 import {
     Typography,
     Button,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
     IconButton,
     Collapse,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { useState } from "react";
+import UpdateWarehouseForm from "./update-warehouse-form";
+import ItemSubEntry from "../item/item-sub-entry";
 
 const WarehouseEntry = ({ id, name, location, maxCapacity, inventory, onUpdate, onDelete }) => {
     const [inventoryOpen, setInventoryOpen] = useState(false);
+    const [updateWarehouseModal, setUpdateWarehouseModal] = useState(false);
+    const [lastUpdatedWarehouse, setLastUpdatedWarehouse] = useState("");
 
-    const handleUpdate = () => {
-        onUpdate(id);
+    const handleUpdate = (updatedWarehouse) => {
+        onUpdate(id, updatedWarehouse);
     };
 
     const handleDelete = () => {
@@ -44,7 +49,7 @@ const WarehouseEntry = ({ id, name, location, maxCapacity, inventory, onUpdate, 
                 <Button
                     variant="contained"
                     size="small"
-                    onClick={handleUpdate}
+                    onClick={() => setUpdateWarehouseModal(true)}
                 >
                     Edit
                 </Button>
@@ -67,7 +72,7 @@ const WarehouseEntry = ({ id, name, location, maxCapacity, inventory, onUpdate, 
                     <IconButton
                         size="small"
                         onClick={(e) => {
-                            e.stopPropagation(); // so the parent click doesn't fire twice
+                            e.stopPropagation();
                             setInventoryOpen(!inventoryOpen);
                         }}
                     >
@@ -75,7 +80,6 @@ const WarehouseEntry = ({ id, name, location, maxCapacity, inventory, onUpdate, 
                     </IconButton>
                 </div>
 
-                {/* Collapsible inventory list */}
                 <Collapse
                     in={inventoryOpen}
                     unmountOnExit
@@ -92,20 +96,30 @@ const WarehouseEntry = ({ id, name, location, maxCapacity, inventory, onUpdate, 
                     </div>
                 </Collapse>
             </div>
-        </>
-    );
-};
 
-const ItemSubEntry = ({ quantity, section, item }) => {
-    return (
-        <>
-            <p>Item Name: {item.name}</p>
-            <div>
-                <p>Quantity: {quantity}</p>
-                <p>Section: {section}</p>
-                <p>Item SKU: {item.sku}</p>
-            </div>
-            <p>Item Description: {item.description}</p>
+            <Dialog
+                open={updateWarehouseModal}
+                onClose={() => setUpdateWarehouseModal(false)}
+            >
+                <DialogTitle>{`Edit Warehouse "${name}"`}</DialogTitle>
+                <DialogContent>
+                    <UpdateWarehouseForm
+                        warehouseId={id}
+                        onUpdate={(data) => {
+                            handleUpdate(data);
+                            setUpdateWarehouseModal(false);
+                        }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={() => setUpdateWarehouseModal(false)}
+                        color="primary"
+                    >
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };

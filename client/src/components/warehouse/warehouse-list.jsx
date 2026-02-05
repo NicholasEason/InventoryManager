@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { Snackbar, Alert } from "@mui/material";
+import {
+    Snackbar,
+    Alert,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button,
+} from "@mui/material";
 
 import WarehouseEntry from "./warehouse-entry";
 import NewWarehouseForm from "./new-warehouse-form";
@@ -11,6 +19,8 @@ const WarehouseList = ({ warehouseEntries }) => {
 
     const [changeSuccess, setChangeSuccess] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
+
+    const [newWarehouseModal, setNewWarehouseModal] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -30,7 +40,6 @@ const WarehouseList = ({ warehouseEntries }) => {
                 }
 
                 const data = await response.json();
-                console.log(data);
                 if (!cancelled) setWarehouses(data);
             } catch (error) {
                 if (!cancelled) setError(error);
@@ -66,8 +75,6 @@ const WarehouseList = ({ warehouseEntries }) => {
 
             const response = await fetch(api_url, request);
 
-            console.log(response);
-
             if (!response.ok) {
                 throw new Error(`Request Failed: ${response.status}`);
             }
@@ -82,7 +89,13 @@ const WarehouseList = ({ warehouseEntries }) => {
         }
     };
 
-    const onWarehouseUpdate = (updatedWarehouse) => {};
+    const onWarehouseUpdate = (id, updatedWarehouse) => {
+        setWarehouses((oldState) => {
+            return oldState.map((warehouse) =>
+                warehouse["_id"] == id ? { ...warehouse, ...updatedWarehouse } : warehouse,
+            );
+        });
+    };
 
     if (loading) {
         return <p>Loading...</p>;
@@ -98,7 +111,6 @@ const WarehouseList = ({ warehouseEntries }) => {
         );
     }
 
-    console.log("warehouses in WarehouseList:", warehouses);
     return (
         <>
             <h2>All Warehouses</h2>
@@ -111,7 +123,7 @@ const WarehouseList = ({ warehouseEntries }) => {
                     maxCapacity={warehouse["maxCapacity"]}
                     inventory={warehouse["inventory"]}
                     onDelete={onWarehouseDelete}
-                    onUpdate={(id) => {}}
+                    onUpdate={onWarehouseUpdate}
                 />
             ))}
 
@@ -139,7 +151,35 @@ const WarehouseList = ({ warehouseEntries }) => {
                 <Alert severity="success">{successMessage}</Alert>
             </Snackbar>
 
-            <NewWarehouseForm onUpdate={onNewWarehouse} />
+            <Button
+                variant="outlined"
+                onClick={() => setNewWarehouseModal(true)}
+            >
+                Add New Warehouse
+            </Button>
+
+            <Dialog
+                open={newWarehouseModal}
+                onClose={() => setNewWarehouseModal(false)}
+            >
+                <DialogTitle>Add a New Warehouse</DialogTitle>
+                <DialogContent>
+                    <NewWarehouseForm
+                        onUpdate={(data) => {
+                            onNewWarehouse(data);
+                            setNewWarehouseModal(false);
+                        }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={() => setNewWarehouseModal(false)}
+                        color="primary"
+                    >
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };

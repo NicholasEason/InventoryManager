@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { TextField, Button, Alert, Snackbar } from "@mui/material";
 
-const NewWarehouseForm = ({ onUpdate }) => {
+const UpdateWarehouseForm = ({ warehouseId, onUpdate, warehouseName }) => {
     const nameRef = useRef();
     const locationRef = useRef();
     const capacityRef = useRef();
@@ -10,7 +10,7 @@ const NewWarehouseForm = ({ onUpdate }) => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
 
-    const createWarehouse = async (event) => {
+    const updateWarehouse = async (event) => {
         event.preventDefault();
         setSubmitting(true);
         setError(null);
@@ -33,10 +33,10 @@ const NewWarehouseForm = ({ onUpdate }) => {
             if (import.meta.env.VITE_API_PORT) {
                 api_url += `:${import.meta.env.VITE_API_PORT}`;
             }
-            api_url += `/warehouses`;
+            api_url += `/warehouses/${warehouseId}`;
 
             const request = {
-                method: "POST",
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -54,8 +54,8 @@ const NewWarehouseForm = ({ onUpdate }) => {
 
             setSuccess(true);
 
-            const newWarehouse = await response.json();
-            onUpdate(newWarehouse);
+            const updatedWarehouse = await response.json();
+            onUpdate(updatedWarehouse);
             event.target.reset();
         } catch (error) {
             setError(error.message);
@@ -64,7 +64,7 @@ const NewWarehouseForm = ({ onUpdate }) => {
 
     return (
         <>
-            <form onSubmit={createWarehouse}>
+            <form onSubmit={updateWarehouse}>
                 <div>
                     <TextField
                         id="warehouseName"
@@ -134,7 +134,7 @@ const NewWarehouseForm = ({ onUpdate }) => {
                             horizontal: "right",
                         }}
                     >
-                        <Alert severity="success">Warehouse Created.</Alert>
+                        <Alert severity="success">Warehouse Updated.</Alert>
                     </Snackbar>
                 )}
             </form>
@@ -142,4 +142,4 @@ const NewWarehouseForm = ({ onUpdate }) => {
     );
 };
 
-export default NewWarehouseForm;
+export default UpdateWarehouseForm;
