@@ -177,22 +177,14 @@ const Overview = () => {
                 container
                 spacing={2}
             >
-                <Grid
-                    item
-                    xs={12}
-                    md={4}
-                >
+                <Grid>
                     <Card
                         variant="outlined"
                         square={true}
                     ></Card>
                 </Grid>
 
-                <Grid
-                    item
-                    xs={12}
-                    md={4}
-                >
+                <Grid>
                     <Card
                         variant="outlined"
                         square={true}
@@ -226,11 +218,7 @@ const Overview = () => {
                     </Card>
                 </Grid>
 
-                <Grid
-                    item
-                    xs={12}
-                    md={4}
-                >
+                <Grid>
                     <Card
                         variant="outlined"
                         square={true}
@@ -259,10 +247,7 @@ const Overview = () => {
                     </Card>
                 </Grid>
 
-                <Grid
-                    item
-                    xs={12}
-                >
+                <Grid>
                     <Card
                         variant="outlined"
                         square={true}
@@ -276,13 +261,7 @@ const Overview = () => {
                                 spacing={2}
                             >
                                 {warehouseSummaries.map((w) => (
-                                    <Grid
-                                        key={w.id}
-                                        item
-                                        xs={12}
-                                        md={8}
-                                        lg={6}
-                                    >
+                                    <Grid key={w.id}>
                                         <Card
                                             variant="outlined"
                                             square={true}
