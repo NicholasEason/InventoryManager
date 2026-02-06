@@ -9,6 +9,10 @@ import {
     DialogTitle,
     Snackbar,
     Alert,
+    Box,
+    Stack,
+    Divider,
+    Chip,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -72,6 +76,14 @@ const WarehouseEntry = ({ id, name, location, maxCapacity, inventory, onUpdate, 
 
     const handleAddInventory = (inventoryEntry) => {
         setItemInventory((oldState) => {
+            const exists = oldState.some((entry) => entry["_id"] === inventoryEntry["_id"]);
+
+            if (exists) {
+                return oldState.map((entry) =>
+                    entry["_id"] === inventoryEntry["_id"] ? inventoryEntry : entry,
+                );
+            }
+
             return [...oldState, inventoryEntry];
         });
     };
@@ -88,88 +100,137 @@ const WarehouseEntry = ({ id, name, location, maxCapacity, inventory, onUpdate, 
 
     return (
         <>
-            <span>
-                <Typography variant="h6">{name}</Typography>
-                <Typography
-                    variant="body2"
-                    color="text.secondary"
+            <Box>
+                <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    justifyContent="space-between"
+                    alignItems={{ xs: "flex-start", sm: "center" }}
+                    spacing={1}
                 >
-                    {location}
-                </Typography>
-                <Typography variant="body2">Max Capacity: {maxCapacity}</Typography>
-            </span>
+                    <Box>
+                        <Typography variant="h6">{name}</Typography>
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                        >
+                            {location}
+                        </Typography>
 
-            <span>
-                {/* This update button is for managing warehouse details but not inventory */}
-                <Button
-                    variant="contained"
-                    size="small"
-                    onClick={() => setUpdateWarehouseModal(true)}
-                >
-                    Edit
-                </Button>
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            sx={{ mt: 0.75 }}
+                        >
+                            <Chip
+                                label={`Max Capacity: ${maxCapacity}`}
+                                variant="outlined"
+                                size="small"
+                            />
+                        </Stack>
+                    </Box>
 
-                <Button
-                    variant="outlined"
-                    color="error"
-                    size="small"
-                    onClick={() => setDeleteConfirmation(true)}
-                >
-                    Delete
-                </Button>
-            </span>
-            <div>
-                <div
-                    onClick={() => setInventoryOpen(!inventoryOpen)}
-                    style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
-                >
-                    <Typography component="span">Inventory</Typography>
-                    <IconButton
-                        size="small"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setInventoryOpen(!inventoryOpen);
-                        }}
+                    <Stack
+                        direction="row"
+                        spacing={1}
                     >
-                        {inventoryOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                    </IconButton>
-                </div>
+                        <Button
+                            variant="contained"
+                            size="small"
+                            onClick={() => setUpdateWarehouseModal(true)}
+                        >
+                            Edit
+                        </Button>
 
-                <Collapse
-                    in={inventoryOpen}
-                    unmountOnExit
-                >
-                    <div>
-                        {itemInventory.map((itemEntry) => {
-                            return (
-                                <ItemSubEntry
-                                    key={itemEntry["_id"]}
-                                    warehouse={{
-                                        _id: id,
-                                        name: name,
-                                        location: location,
-                                        capacity: maxCapacity,
-                                        inventory: inventory,
-                                    }}
-                                    id={itemEntry["_id"]}
-                                    quantity={itemEntry["quantity"]}
-                                    section={itemEntry["section"]}
-                                    item={itemEntry["item"]}
-                                    postUpdate={postUpdate}
-                                    onUpdate={handleUpdateInventoryItem}
-                                    onDelete={handleDeleteItem}
-                                />
-                            );
-                        })}
                         <Button
                             variant="outlined"
-                            onClick={() => setNewItemModal(true)}
+                            color="error"
+                            size="small"
+                            onClick={() => setDeleteConfirmation(true)}
                         >
-                            Add New Item
+                            Delete
                         </Button>
-                    </div>
-                </Collapse>
-            </div>
+                    </Stack>
+                </Stack>
+
+                <Divider sx={{ my: 1.5 }} />
+
+                <Box>
+                    <Box
+                        onClick={() => setInventoryOpen(!inventoryOpen)}
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            cursor: "pointer",
+                            userSelect: "none",
+                        }}
+                    >
+                        <Typography
+                            component="span"
+                            fontWeight={600}
+                        >
+                            Inventory
+                        </Typography>
+
+                        <IconButton
+                            size="small"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setInventoryOpen(!inventoryOpen);
+                            }}
+                        >
+                            {inventoryOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                        </IconButton>
+                    </Box>
+
+                    <Collapse
+                        in={inventoryOpen}
+                        unmountOnExit
+                    >
+                        <Box sx={{ mt: 1.25 }}>
+                            {itemInventory.length === 0 ? (
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ mb: 1 }}
+                                >
+                                    No inventory items in this warehouse.
+                                </Typography>
+                            ) : null}
+
+                            {itemInventory.map((itemEntry) => {
+                                return (
+                                    <ItemSubEntry
+                                        key={itemEntry["_id"]}
+                                        warehouse={{
+                                            _id: id,
+                                            name: name,
+                                            location: location,
+                                            capacity: maxCapacity,
+                                            inventory: itemInventory,
+                                        }}
+                                        id={itemEntry["_id"]}
+                                        quantity={itemEntry["quantity"]}
+                                        section={itemEntry["section"]}
+                                        item={itemEntry["item"]}
+                                        postUpdate={postUpdate}
+                                        onUpdate={handleUpdateInventoryItem}
+                                        onDelete={handleDeleteItem}
+                                    />
+                                );
+                            })}
+                            <Box sx={{ mt: 1 }}>
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => setNewItemModal(true)}
+                                >
+                                    Add New Item
+                                </Button>
+                            </Box>
+                        </Box>
+                    </Collapse>
+                </Box>
+            </Box>
 
             <Dialog
                 open={updateWarehouseModal}
@@ -207,7 +268,7 @@ const WarehouseEntry = ({ id, name, location, maxCapacity, inventory, onUpdate, 
                             name: name,
                             location: location,
                             capacity: maxCapacity,
-                            inventory: inventory,
+                            inventory: itemInventory,
                         }}
                         onUpdate={(data) => {
                             handleAddInventory(data);
@@ -225,6 +286,7 @@ const WarehouseEntry = ({ id, name, location, maxCapacity, inventory, onUpdate, 
                     </Button>
                 </DialogActions>
             </Dialog>
+
             {error && (
                 <Snackbar
                     open={error}
@@ -252,6 +314,7 @@ const WarehouseEntry = ({ id, name, location, maxCapacity, inventory, onUpdate, 
                     <Alert severity="success">Inventory updated.</Alert>
                 </Snackbar>
             )}
+
             <DeleteConfirmation
                 active={deleteConfirmation}
                 onDelete={handleDelete}

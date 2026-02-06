@@ -7,6 +7,12 @@ import {
     DialogContent,
     DialogActions,
     Button,
+    Box,
+    Typography,
+    Stack,
+    Divider,
+    Card,
+    CardContent,
 } from "@mui/material";
 
 import ItemEntry from "./item-entry";
@@ -115,20 +121,77 @@ const ItemList = ({ itemEntries }) => {
 
     return (
         <>
-            <h2>All Items</h2>
-            {items.map((item) => (
-                <ItemEntry
-                    key={item["_id"]}
-                    id={item["_id"]}
-                    name={item["name"]}
-                    sku={item["sku"]}
-                    description={item["description"]}
-                    category={item["category"]}
-                    onDelete={onItemDelete}
-                    onUpdate={onItemUpdate}
-                    isUniqueSKU={isUniqueSKU}
-                />
-            ))}
+            <Box
+                sx={{
+                    width: "80%",
+                    mx: "auto",
+                }}
+            >
+                <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    justifyContent="space-between"
+                    alignItems={{ xs: "flex-start", sm: "center" }}
+                    spacing={1}
+                    sx={{ mb: 1 }}
+                >
+                    <Typography variant="h4">Items</Typography>
+
+                    <Button
+                        variant="outlined"
+                        onClick={() => setNewItemModal(true)}
+                    >
+                        Add New Item
+                    </Button>
+                </Stack>
+
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                >
+                    Manage your item catalog. Add, edit, or delete items.
+                </Typography>
+
+                <Divider sx={{ my: 2 }} />
+
+                {items.length === 0 ? (
+                    <Card
+                        variant="outlined"
+                        square={true}
+                    >
+                        <CardContent>
+                            <Typography
+                                variant="body2"
+                                color="text.secondary"
+                            >
+                                No items found.
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <Stack spacing={2}>
+                        {items.map((item) => (
+                            <Card
+                                key={item["_id"]}
+                                variant="outlined"
+                                square={true}
+                            >
+                                <CardContent>
+                                    <ItemEntry
+                                        id={item["_id"]}
+                                        name={item["name"]}
+                                        sku={item["sku"]}
+                                        description={item["description"]}
+                                        category={item["category"]}
+                                        onDelete={onItemDelete}
+                                        onUpdate={onItemUpdate}
+                                        isUniqueSKU={isUniqueSKU}
+                                    />
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </Stack>
+                )}
+            </Box>
 
             <Snackbar
                 open={error}
@@ -153,13 +216,6 @@ const ItemList = ({ itemEntries }) => {
             >
                 <Alert severity="success">{successMessage}</Alert>
             </Snackbar>
-            <br></br>
-            <Button
-                variant="outlined"
-                onClick={() => setNewItemModal(true)}
-            >
-                Add New Item
-            </Button>
 
             <Dialog
                 open={newItemModal}

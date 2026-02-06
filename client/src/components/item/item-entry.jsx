@@ -5,6 +5,10 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
+    Stack,
+    Box,
+    Divider,
+    Chip,
 } from "@mui/material";
 import { useState } from "react";
 import UpdateItemForm from "./update-item-form";
@@ -24,31 +28,68 @@ const ItemEntry = ({ id, name, sku, description, category, onUpdate, onDelete, i
 
     return (
         <>
-            <span>
-                <Typography variant="h6">{name}</Typography>
-            </span>
-            <Typography variant="body1">SKU: {sku}</Typography>
-            <Typography variant="body1">Category: {category}</Typography>
-            <Typography variant="body2">{description}</Typography>
+            <Stack
+                direction={{ xs: "column", sm: "row" }}
+                justifyContent="space-between"
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                spacing={1}
+            >
+                <Box>
+                    <Typography variant="h6">{name}</Typography>
 
-            <span>
-                <Button
-                    variant="contained"
-                    size="small"
-                    onClick={() => setUpdateItemModal(true)}
-                >
-                    Edit
-                </Button>
+                    <Stack
+                        direction="row"
+                        spacing={1}
+                        sx={{ mt: 0.75 }}
+                    >
+                        <Chip
+                            label={`SKU: ${sku}`}
+                            size="small"
+                            variant="outlined"
+                        />
+                        <Chip
+                            label={`Category: ${category}`}
+                            size="small"
+                            variant="outlined"
+                        />
+                    </Stack>
+                </Box>
 
-                <Button
-                    variant="outlined"
-                    color="error"
-                    size="small"
-                    onClick={() => setDeleteConfirmation(true)}
+                <Stack
+                    direction="row"
+                    spacing={1}
                 >
-                    Delete
-                </Button>
-            </span>
+                    <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => setUpdateItemModal(true)}
+                    >
+                        Edit
+                    </Button>
+
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        onClick={() => setDeleteConfirmation(true)}
+                    >
+                        Delete
+                    </Button>
+                </Stack>
+            </Stack>
+
+            <Divider sx={{ my: 1.25 }} />
+
+            {description ? (
+                <Typography variant="body2">{description}</Typography>
+            ) : (
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                >
+                    No description.
+                </Typography>
+            )}
 
             <Dialog
                 open={updateItemModal}
