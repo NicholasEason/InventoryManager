@@ -22,13 +22,10 @@ const getWarehouseById = async (id) => {
 
 const createWarehouse = async (warehouseJSON) => {
     if(warehouseJSON.inventory) {
-        //Dont let users submit a new warehouse with any inventory.
-        //They can add/manage items later.
         warehouseJSON.inventory = [];
     }
     const {response, error} = await warehouseRepo.createWarehouse(warehouseJSON);
     if(error){
-        //TODO: do something with the error
         console.log(error);
     } else {
         return {response, error};

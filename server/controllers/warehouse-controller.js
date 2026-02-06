@@ -39,7 +39,7 @@ const createWarehouse = async (req, res) => {
     }
 
     if(error){
-        res.status(500).send("Something went wrong.");
+        res.status(error.status).send(error.message);
     } else {
         res.status(201).send(response);
     }
