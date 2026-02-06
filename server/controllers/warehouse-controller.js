@@ -57,7 +57,7 @@ const updateWarehouse = async (req, res, id) => {
     }
 
     if(error){
-        res.status(500).send("Something went wrong.");
+        res.status(error.status).send(error.message);
     } else {
         res.status(200).send(response);
     }
