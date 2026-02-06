@@ -8,9 +8,11 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import UpdateItemForm from "./update-item-form";
+import DeleteConfirmation from "../extras/delete-confirmation";
 
 const ItemEntry = ({ id, name, sku, description, category, onUpdate, onDelete, isUniqueSKU }) => {
     const [updateItemModal, setUpdateItemModal] = useState(false);
+    const [deleteConfirmation, setDeleteConfirmation] = useState(false);
 
     const handleUpdate = (updatedItem) => {
         onUpdate(id, updatedItem);
@@ -42,7 +44,7 @@ const ItemEntry = ({ id, name, sku, description, category, onUpdate, onDelete, i
                     variant="outlined"
                     color="error"
                     size="small"
-                    onClick={handleDelete}
+                    onClick={() => setDeleteConfirmation(true)}
                 >
                     Delete
                 </Button>
@@ -78,6 +80,14 @@ const ItemEntry = ({ id, name, sku, description, category, onUpdate, onDelete, i
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <DeleteConfirmation
+                active={deleteConfirmation}
+                onDelete={handleDelete}
+                message={`Are you sure you'd like to delete ${name}?`}
+                title={`Delete ${name}`}
+                onClose={() => setDeleteConfirmation(false)}
+            />
         </>
     );
 };

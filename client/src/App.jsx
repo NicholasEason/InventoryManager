@@ -6,7 +6,7 @@ import ItemList from "./components/item/item-list";
 function App() {
     return (
         <>
-            <WarehouseList />
+            <ItemList />
         </>
     );
 }

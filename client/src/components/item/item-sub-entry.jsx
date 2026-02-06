@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import UpdateInventoryItemForm from "../inventory/update-inventory-item-form";
+import DeleteConfirmation from "../extras/delete-confirmation";
 const ItemSubEntry = ({
     warehouse,
     id,
@@ -23,9 +24,10 @@ const ItemSubEntry = ({
     postUpdate,
 }) => {
     const [updateItemModal, setUpdateItemModal] = useState(false);
+    const [deleteConfirmation, setDeleteConfirmation] = useState(false);
 
-    const handleDelete = async (event) => {
-        event.preventDefault();
+    const handleDelete = async () => {
+        setDeleteConfirmation(false);
 
         warehouse.inventory = warehouse.inventory.filter((itemEntry) => itemEntry["_id"] != id);
 
@@ -95,11 +97,21 @@ const ItemSubEntry = ({
                             Edit
                         </Button>
 
+                        {/**I'll work on this if I have time, this is a less important feature */}
+                        {/* <Button
+                            variant="contained"
+                            size="small"
+                            color="secondary"
+                            onClick={() => setTransferModal(true)}
+                        >
+                            Transfer
+                        </Button> */}
+
                         <Button
                             variant="outlined"
                             color="error"
                             size="small"
-                            onClick={handleDelete}
+                            onClick={() => setDeleteConfirmation(true)}
                         >
                             Delete
                         </Button>
@@ -131,6 +143,14 @@ const ItemSubEntry = ({
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <DeleteConfirmation
+                active={deleteConfirmation}
+                onDelete={handleDelete}
+                message={`Are you sure you'd like to delete ${item.name} from ${warehouse.name}?`}
+                title={`Delete ${item.name}`}
+                onClose={() => setDeleteConfirmation(false)}
+            />
         </>
     );
 };

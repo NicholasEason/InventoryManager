@@ -16,6 +16,7 @@ import { useState } from "react";
 import UpdateWarehouseForm from "./update-warehouse-form";
 import ItemSubEntry from "../item/item-sub-entry";
 import NewInventoryItemForm from "../inventory/new-inventory-item-form";
+import DeleteConfirmation from "../extras/delete-confirmation";
 
 const WarehouseEntry = ({ id, name, location, maxCapacity, inventory, onUpdate, onDelete }) => {
     const [inventoryOpen, setInventoryOpen] = useState(false);
@@ -24,6 +25,7 @@ const WarehouseEntry = ({ id, name, location, maxCapacity, inventory, onUpdate, 
     const [newItemModal, setNewItemModal] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const [deleteConfirmation, setDeleteConfirmation] = useState(false);
 
     const postUpdate = async (warehouse) => {
         try {
@@ -111,7 +113,7 @@ const WarehouseEntry = ({ id, name, location, maxCapacity, inventory, onUpdate, 
                     variant="outlined"
                     color="error"
                     size="small"
-                    onClick={handleDelete}
+                    onClick={() => setDeleteConfirmation(true)}
                 >
                     Delete
                 </Button>
@@ -250,6 +252,13 @@ const WarehouseEntry = ({ id, name, location, maxCapacity, inventory, onUpdate, 
                     <Alert severity="success">Inventory updated.</Alert>
                 </Snackbar>
             )}
+            <DeleteConfirmation
+                active={deleteConfirmation}
+                onDelete={handleDelete}
+                message={`Are you sure you'd like to delete ${name}?`}
+                title={`Delete ${name}`}
+                onClose={() => setDeleteConfirmation(false)}
+            />
         </>
     );
 };
