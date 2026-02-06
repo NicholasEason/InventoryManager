@@ -80,6 +80,10 @@ const Overview = () => {
             return { label: "Over capacity", severity: "error", percent };
         }
 
+        if (current == cap) {
+            return { label: "At capacity", severity: "error", percent };
+        }
+
         if (percent >= 90) {
             return { label: "Near capacity", severity: "warning", percent };
         }
