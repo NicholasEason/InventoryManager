@@ -11,6 +11,18 @@ const NewInventoryItemForm = ({ warehouse, onUpdate, postUpdate }) => {
     const [allItems, setAllItems] = useState([]);
     const [selectedItemId, setSelectedItemId] = useState("");
 
+    const getWarehouseCapacity = () => {
+        return Number(warehouse["maxCapacity"] ?? warehouse["capacity"]) || 0;
+    };
+
+    const getCurrentUsed = () => {
+        if (!warehouse || !warehouse["inventory"]) return 0;
+
+        return warehouse["inventory"].reduce((sum, entry) => {
+            return sum + (Number(entry["quantity"]) || 0);
+        }, 0);
+    };
+
     useEffect(() => {
         if (allItems.length && !selectedItemId) {
             setSelectedItemId(allItems[0]._id);
@@ -65,27 +77,71 @@ const NewInventoryItemForm = ({ warehouse, onUpdate, postUpdate }) => {
             return;
         }
 
-        let newItem = {
-            quantity: quantity,
-            section: section,
-            item: allItems.find((item) => item["_id"] === selectedItemId),
-        };
+        const cap = getWarehouseCapacity();
+        const used = getCurrentUsed();
+        const remaining = cap > 0 ? cap - used : null;
 
-        warehouse.inventory.push(newItem);
+        if (cap > 0 && quantity > remaining) {
+            setError(
+                `Not enough remaining capacity. Remaining: ${remaining}. Requested: ${quantity}.`,
+            );
+            setSubmitting(false);
+            return;
+        }
+
+        const selectedItem = allItems.find((item) => item["_id"] === selectedItemId);
+
+        if (!selectedItem) {
+            setError("Item not found.");
+            setSubmitting(false);
+            return;
+        }
+
+        const normalizedSection = section.trim().toLowerCase();
+
+        const existingEntry = (warehouse.inventory || []).find((entry) => {
+            const entryItemId = entry?.item?._id || entry?.item;
+            const entrySection = (entry?.section || "").trim().toLowerCase();
+
+            return entryItemId === selectedItemId && entrySection === normalizedSection;
+        });
+
+        if (existingEntry) {
+            const newQty = (Number(existingEntry.quantity) || 0) + quantity;
+
+            warehouse.inventory = (warehouse.inventory || []).map((entry) => {
+                if (entry["_id"] === existingEntry["_id"]) {
+                    return { ...entry, quantity: newQty, section: section.trim() };
+                }
+                return entry;
+            });
+        } else {
+            const newItem = {
+                quantity: quantity,
+                section: section.trim(),
+                item: selectedItem,
+            };
+
+            warehouse.inventory = [...(warehouse.inventory || []), newItem];
+        }
 
         const newWarehouse = await postUpdate(warehouse);
 
-        const serverItem = newWarehouse["inventory"].find(
-            (itemEntry) =>
-                itemEntry.item["_id"] === newItem.item["_id"] &&
-                itemEntry.quantity === newItem.quantity &&
-                itemEntry.section === newItem.section,
-        );
+        const serverItem = newWarehouse["inventory"].find((entry) => {
+            const entryItemId = entry?.item?._id || entry?.item;
+            const entrySection = (entry?.section || "").trim().toLowerCase();
+
+            return entryItemId === selectedItemId && entrySection === normalizedSection;
+        });
 
         onUpdate(serverItem);
 
         event.target.reset();
     };
+
+    const cap = getWarehouseCapacity();
+    const used = getCurrentUsed();
+    const maxAllowed = cap > 0 ? Math.max(0, cap - used) : undefined;
 
     return (
         <>
@@ -120,9 +176,17 @@ const NewInventoryItemForm = ({ warehouse, onUpdate, postUpdate }) => {
                         type="number"
                         inputRef={quantityRef}
                         variant="outlined"
-                        slotProps={{ htmlInput: { min: 0 } }}
+                        slotProps={{
+                            htmlInput: {
+                                min: 0,
+                                ...(maxAllowed !== undefined ? { max: maxAllowed } : {}),
+                            },
+                        }}
                         size="small"
                         sx={{ m: 2, width: 0.8 }}
+                        helperText={
+                            maxAllowed !== undefined ? `Remaining capacity: ${maxAllowed}` : ""
+                        }
                     />
                 </div>
 

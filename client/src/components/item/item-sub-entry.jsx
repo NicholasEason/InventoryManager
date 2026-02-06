@@ -9,10 +9,12 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
+    Box,
 } from "@mui/material";
 import { useState } from "react";
 import UpdateInventoryItemForm from "../inventory/update-inventory-item-form";
 import DeleteConfirmation from "../extras/delete-confirmation";
+
 const ItemSubEntry = ({
     warehouse,
     id,
@@ -44,12 +46,50 @@ const ItemSubEntry = ({
                 sx={{ m: 1 }}
             >
                 <CardContent>
-                    <Typography
-                        variant="subtitle1"
-                        fontWeight={600}
+                    <Stack
+                        direction={{ xs: "column", sm: "row" }}
+                        justifyContent="space-between"
+                        alignItems={{ xs: "flex-start", sm: "center" }}
+                        spacing={1}
                     >
-                        {item.name}
-                    </Typography>
+                        <Box>
+                            <Typography
+                                variant="subtitle1"
+                                fontWeight={600}
+                            >
+                                {item.name}
+                            </Typography>
+
+                            <Typography
+                                variant="body2"
+                                color="text.secondary"
+                            >
+                                SKU: {item.sku}
+                            </Typography>
+                        </Box>
+
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                        >
+                            <Button
+                                variant="contained"
+                                size="small"
+                                onClick={() => setUpdateItemModal(true)}
+                            >
+                                Edit
+                            </Button>
+
+                            <Button
+                                variant="outlined"
+                                color="error"
+                                size="small"
+                                onClick={() => setDeleteConfirmation(true)}
+                            >
+                                Delete
+                            </Button>
+                        </Stack>
+                    </Stack>
 
                     <Divider sx={{ my: 1.25 }} />
 
@@ -70,13 +110,6 @@ const ItemSubEntry = ({
                         >
                             <strong>Section:</strong> {section}
                         </Typography>
-
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                        >
-                            <strong>SKU:</strong> {item.sku}
-                        </Typography>
                     </Stack>
 
                     {item.description ? (
@@ -86,38 +119,18 @@ const ItemSubEntry = ({
                         >
                             <strong>Description:</strong> {item.description}
                         </Typography>
-                    ) : null}
-
-                    <div>
-                        <Button
-                            variant="contained"
-                            size="small"
-                            onClick={() => setUpdateItemModal(true)}
+                    ) : (
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mt: 1.25 }}
                         >
-                            Edit
-                        </Button>
-
-                        {/**I'll work on this if I have time, this is a less important feature */}
-                        {/* <Button
-                            variant="contained"
-                            size="small"
-                            color="secondary"
-                            onClick={() => setTransferModal(true)}
-                        >
-                            Transfer
-                        </Button> */}
-
-                        <Button
-                            variant="outlined"
-                            color="error"
-                            size="small"
-                            onClick={() => setDeleteConfirmation(true)}
-                        >
-                            Delete
-                        </Button>
-                    </div>
+                            <strong>Description:</strong> None
+                        </Typography>
+                    )}
                 </CardContent>
             </Card>
+
             <Dialog
                 open={updateItemModal}
                 onClose={() => setUpdateItemModal(false)}
@@ -130,7 +143,10 @@ const ItemSubEntry = ({
                         id={id}
                         quantity={quantity}
                         section={section}
-                        onUpdate={onUpdate}
+                        onUpdate={async (...args) => {
+                            await onUpdate(...args);
+                            setUpdateItemModal(false);
+                        }}
                         postUpdate={postUpdate}
                     />
                 </DialogContent>
